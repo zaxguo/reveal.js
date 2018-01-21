@@ -79,74 +79,197 @@
 						--!>
 					</section>
 					<section>
-						<h2>Basement Level 1</h2>
-						<p>Nested slides are useful for adding additional detail underneath a high level horizontal slide.</p>
+						<h2>CPU u-Architecture</h2>
+						<img width="40%" height="10%" data-src="http://francis.naukas.com/files/2018/01/Dibujo20180104-Simplified-illustration-single-core-Intel-Skylake-microarchitecture-meltdown-Moritz-Lipp-et-al.png">
+						</img>
 					</section>
 					<section>
-						<h2>Basement Level 2</h2>
-						<p>That's it, time to go back up.</p>
-						<br>
+						<h2>Speculative Execution</h2>
+						<p>Exemplified in branch prediction, which usually keeps a table of taken/not taken mapping.</p>
+						<img width="50%" height="20%" data-src="assets/branch_predictor.jpg"/>
 					</section>
+
+					<section>
+					<h2>So what?</h2>
+					<ul>
+					<li>
+					Even though OOO and speculative execution happen all the time, the instructions will only be committed and take effect <i>IFF</i> conditions evalutate to <i>TRUE</i>.
+					</li>
+					<li>
+					A triggered exception or a mis-predicted branch will cause the pipeline to be flushed and mis-executed instructions (we call them <i>transient</i> instructions) to be reverted.
+					</li>
+					<li>
+					Therefore, we need a covert channel to transmit the information out!
+					</li>
+					</ul>
+					</section>
+
+					<section>
+					<h2>Side-channel Attack</h2>
+					<ul>
+						<li>A very common attack vector. It utilizes "side-channel" info, which usually reflects running status of the victim.</li>
+						<li>Power side channel: power traces leak what is going on with your device.</li>
+						<li>Cache side channel: (i.e., timing side channel) time difference between a cache hit/miss is so significant that running status can be captured by measuring such time difference.</li>
+					</ul>
+
+					</section>
+
 				</section>
 
 				<section>
-					<h2>Point of View</h2>
+					<h2>Meltdown</h2>
+					<h3>in one sentence</h3>
 					<p>
-						Press <strong>ESC</strong> to enter the slide overview.
-					</p>
-					<p>
-						Hold down alt and click on any element to zoom in on it using <a href="http://lab.hakim.se/zoom-js">zoom.js</a>. Alt + click anywhere to zoom back out.
-					</p>
-				</section>
-
-				<section>
-					<h2>Touch Optimized</h2>
-					<p>
-						Presentations look great on touch devices, like mobile phones and tablets. Simply swipe through your slides.
+						Meltdown is an attack that exploits OOO execution of modern CPU and utilizes cache side-channel to transmit information.
 					</p>
 				</section>
 
 				<section data-markdown>
 					<script type="text/template">
-						## Markdown support
+					### Building Blocks 
+					*	Craft *transient* instructions: these instructions access kernel memory.
+					*	Handle the *exception*: the only thing we need to do is make sure the program doesn't crash.
+					*	Extract the *information*: although *transient* instructions don't change the architectural state, the damage cannot be undone.	
 
-						Write content using inline or external Markdown.
-						Instructions and more info available in the [readme](https://github.com/hakimel/reveal.js#markdown).
+				</script>
+				</section>
+
+				<section>
+				<section data-markdown>
+					<script type="text/template">
+						### Crafting Transient Instructions 
+						*	These instructions should not have been executed from a programmer's perspective.
 
 						```
-						<section data-markdown>
-						  ## Markdown support
+						/* This traps into kernel exception handler */
+						raise_exception();  
+						/* This should not be executed, transient */
+						access(probe_array[data * 4096]);
 
-						  Write content using inline or external Markdown.
-						  Instructions and more info available in the [readme](https://github.com/hakimel/reveal.js#markdown).
-						</section>
 						```
+						*	However, the instructions might have been executed due to OOO and causes u-architectural state change (NOT architectural state change!)
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### Handling Exceptions
+						*	We do not want the program to crash because our desired data is not transmitted out yet!	
+							*	Viable approaches: fork and execute, handle the signal, supress the exception.
 					</script>
 				</section>
 
 				<section>
-					<section id="fragments">
-						<h2>Fragments</h2>
-						<p>Hit the next arrow...</p>
-						<p class="fragment">... to step through ...</p>
-						<p><span class="fragment">... a</span> <span class="fragment">fragmented</span> <span class="fragment">slide.</span></p>
-
-						<aside class="notes">
-							This slide has fragments which are also stepped through in the notes window.
-						</aside>
-					</section>
-					<section>
-						<h2>Fragment Styles</h2>
-						<p>There's different types of fragments, like:</p>
-						<p class="fragment grow">grow</p>
-						<p class="fragment shrink">shrink</p>
-						<p class="fragment fade-out">fade-out</p>
-						<p class="fragment fade-up">fade-up (also down, left and right!)</p>
-						<p class="fragment current-visible">current-visible</p>
-						<p>Highlight <span class="fragment highlight-red">red</span> <span class="fragment highlight-blue">blue</span> <span class="fragment highlight-green">green</span></p>
-					</section>
+					<ul>
+						<li>	<p class="fragment">Fork and Execute: child process will be terminated while parent process survies!</p> </li>
+						<li>	<p class="fragment">Signal Handler: handle the exception so that it won't terminate by default.</p> </li>
+						<li>	<p class="fragment">	Suppressing Exception: utilize transactional memory (thanks to Intel), a feature that allows to combine multiple memory accesses and roll-back if an error occurs. </p> </li>
+					</ul>
 				</section>
 
+			<section data-markdown>
+					<script type="text/template">
+						###  Extracting Information
+						*	Now that the *transient* instructions are excuted, and execptions are handled, we can utlize cache side channel to extract the infromation out.	
+						*	A seemingly naive approach: exhaustively enumerate through all possible data bit by bit. 
+					</script>
+				</section>
+				</section>
+
+				<section>
+					<h1>DEMO TIME!</h1>	
+				</section>
+
+				<section>
+					<h2>Spectre</h2>
+					<h3>in one sentence</h3>
+					<p>
+						Spectre is an attack that exploits speculative execution of modern CPU and utilizes cache side-channel to transmit information.
+					</p>
+				</section>
+
+				<section>
+				<section data-markdown>
+					<script type="text/template">
+					### Building Blocks 
+					*	Craft *transient* instructions: instead of hoping the CPU will execute transient instructions in a OOO fashion, Spectre trains the branch predictor to speculatively execute transient instruction. 
+
+				</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+					### Rig the branch predictor 
+					```c
+					/* Compiler hint to optimize for branch */
+					if (likely(a == true)) {
+						access(probe_array[index]);
+					}
+					```	
+					*	Spectre tweaks the branch predictor by first feed (train) it with a series of successful branch jump.
+					*	Then it places malicious instructions behind some branch jump so that it can be speculatively executed.
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+					*	Additionally, it makes sure that such branch jump never evaluates to **true** (i.e., no exception triggered).
+					*	However, since the instructions are already speculatively executed, the damage cannot be undone.  
+				</script>
+				</section>
+				</section>
+
+				<section>
+					<h1>DEMO TIME!</h1>	
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+					## Now what?
+					*	The security breach looks pretty bad: your kernel can be dumped at ~503KB/s.
+					*	What can we do to counter this hack?
+					*	First, we need to understand this hack.
+				</script>
+				</section>
+
+				<section>
+				<section data-markdown>
+					<script type="text/template">
+					*	What's the root cause of such hack?
+						*	From hardware, there's nothing we can do.
+						*	Software? 
+				</script>
+				</section>
+				<section data-markdown>
+					<script type="text/template">
+					##	KAISER and KALSER
+					*	Don't worry. The patch has been developed since last June and may be deployed before you even noticed. Check your **CONFIG_KAISER**
+					*	Spectre is a little tricky, which needs firmware update and can only be mitigated.	
+					*	But if you don't really care, well you may just ignore them...
+				</script>
+				</section>
+
+				</section>
+
+				<section>
+				<section data-markdown>
+					<script type="text/template">
+					##	The impact 
+					*	Security is a tradeoff and takes overhead.	
+					*	The impact of KAISER patch is foreseeable.
+						*	Workload related
+				</script>
+				</section>
+
+				<section>
+					
+				</section>
+
+				</section>
+
+
+
+				<!--
 				<section id="transitions">
 					<h2>Transition Styles</h2>
 					<p>
@@ -159,26 +282,9 @@
 						<a href="?transition=zoom#/transitions">Zoom</a>
 					</p>
 				</section>
+				-->
 
-				<section id="themes">
-					<h2>Themes</h2>
-					<p>
-						reveal.js comes with a few themes built in: <br>
-						<!-- Hacks to swap themes after the page has loaded. Not flexible and only intended for the reveal.js demo deck. -->
-						<a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/black.css'); return false;">Black (default)</a> -
-						<a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/white.css'); return false;">White</a> -
-						<a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/league.css'); return false;">League</a> -
-						<a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/sky.css'); return false;">Sky</a> -
-						<a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/beige.css'); return false;">Beige</a> -
-						<a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/simple.css'); return false;">Simple</a> <br>
-						<a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/serif.css'); return false;">Serif</a> -
-						<a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/blood.css'); return false;">Blood</a> -
-						<a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/night.css'); return false;">Night</a> -
-						<a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/moon.css'); return false;">Moon</a> -
-						<a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/solarized.css'); return false;">Solarized</a>
-					</p>
-				</section>
-
+				<!--
 				<section>
 					<section data-background="#dddddd">
 						<h2>Slide Backgrounds</h2>
@@ -207,7 +313,6 @@
 						<h2>... and GIFs!</h2>
 					</section>
 				</section>
-
 				<section data-transition="slide" data-background="#4d7e65" data-background-transition="zoom">
 					<h2>Background Transitions</h2>
 					<p>
@@ -223,6 +328,7 @@
 					</p>
 					<pre><code class="hljs" style="word-wrap: break-word;">&lt;section data-background-transition="zoom"&gt;</code></pre>
 				</section>
+				-->
 
 				<section>
 					<h2>Pretty Code</h2>
@@ -245,6 +351,7 @@ function linkify( selector ) {
 					<p>Code syntax highlighting courtesy of <a href="http://softwaremaniacs.org/soft/highlight/en/description/">highlight.js</a>.</p>
 				</section>
 
+				<!--
 				<section>
 					<h2>Marvelous List</h2>
 					<ul>
@@ -293,6 +400,7 @@ function linkify( selector ) {
 						</tbody>
 					</table>
 				</section>
+				-->
 
 				<section>
 					<h2>Clever Quotes</h2>
