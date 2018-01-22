@@ -41,11 +41,16 @@
 			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides">
 				<section>
+				<section>
 					<h1>Meltdown & Spectre</h1>
 					<h3>Exploiting Out-Of-Order/Speculative Execution in Modern CPU</h3>
 					<p>
 					<small>Liwei Guo</br><a href="http://xsel.rocks">XSEL</a> </small>
 					</p>
+				</section>
+				<section>
+					<img data-src="https://images.anandtech.com/doci/12214/meltdown_spectre_678x452.png"/>
+				</section>
 				</section>
 
 				<section data-markdown>
@@ -242,12 +247,22 @@
 				</section>
 				<section data-markdown>
 					<script type="text/template">
-					##	KAISER and KALSER
+					##	KAISER (Meltdown fix)
 					*	Don't worry. The patch has been developed since last June and may be deployed before you even noticed. Check your **CONFIG_KAISER**
 					*	Spectre is a little tricky, which needs firmware update and can only be mitigated.	
 					*	But if you don't really care, well you may just ignore them...
 				</script>
 				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+					## Spectre mitigation	
+					*	Javascript: Site isolation, reduce JS timer resolution.			
+					*	[Retpoline](https://support.google.com/faqs/answer/7625886): compiler level steering of indirect branches.	
+					*	But if you don't really care, well you may just ignore them...
+				</script>
+				</section>
+
 
 				</section>
 
@@ -261,12 +276,42 @@
 				</script>
 				</section>
 
+				<section data-markdown>
+					<script type="text/template">
+					*	Overhead required for security hardening in user-kernel transition
+						*	8-19%: highly cached random memory, with buffered I/O, database workload (OLTP, sysbench, pgbench, netperf, fio)	
+						*	3-7%:	database analytics, JAVA VMs, which may have significant sequential disk/network traffic but drivers are able to aggregate and moderate transition.	
+						*	2-5%:	HPC CPU-intensive workloads	
+						*	[Results from Intel](https://newsroom.intel.com/wp-content/uploads/sites/11/2018/01/Blog-Benchmark-Table.pdf)
+						*	[Phoronix Test](https://www.phoronix.com/scan.php?page=article&item=clear-kpti-retpoline&num=1)
+				</script>
+
+				</section>
+
+
 				<section>
 					
+				<img data-src="https://cdn-images-1.medium.com/max/2000/1*Vpw_ogVFJmM3eQvwo7h_Hg.png"/>
+				</section>
+
+				<section>
+					<img data-src="https://cdn-images-1.medium.com/max/2000/1*NNbjT_RKsi5Gy3MCjUwyJA.png"/>
+				</section>
+
+				<section>
+					<img data-src="https://cdn-images-1.medium.com/max/1000/1*n9wqskOEst1LP-eG3R3fJw.png"/>
 				</section>
 
 				</section>
 
+				<section data-markdown>
+				<script type="text/template">
+				### Conclusions
+				*	Meltdown and Spectre exploit OOO/speculative execution in modern CPU and use cache side channel to leak the secret.
+				*	Meltdown can be stopped by software (KAISER) but Spectre can only be mitigated and require firmware update.
+				*	Security hardening takes overhead: the performance impact varies from 1~20%.
+				</script>
+				</section>
 
 
 				<!--
@@ -329,7 +374,7 @@
 					<pre><code class="hljs" style="word-wrap: break-word;">&lt;section data-background-transition="zoom"&gt;</code></pre>
 				</section>
 				-->
-
+				<!--
 				<section>
 					<h2>Pretty Code</h2>
 					<pre><code class="hljs" data-trim contenteditable>
@@ -350,6 +395,7 @@ function linkify( selector ) {
 					</code></pre>
 					<p>Code syntax highlighting courtesy of <a href="http://softwaremaniacs.org/soft/highlight/en/description/">highlight.js</a>.</p>
 				</section>
+				-->
 
 				<!--
 				<section>
@@ -401,7 +447,7 @@ function linkify( selector ) {
 					</table>
 				</section>
 				-->
-
+				<!--
 				<section>
 					<h2>Clever Quotes</h2>
 					<p>
@@ -483,6 +529,7 @@ Reveal.addEventListener( 'customevent', function() {
 						- <a href="https://github.com/hakimel/reveal.js">Source code &amp; documentation</a>
 					</p>
 				</section>
+				-->
 
 			</div>
 
