@@ -364,6 +364,34 @@
 					</script>
 				</section>
 
+				<section data-markdown>
+					<script type="text/template">
+						### C++11 Memory Model (Implementation)
+						```c
+						mut_x.lock(); // ld.acq mut_x 
+						 |
+						 V
+						...read/write x.. 
+						 ^
+						 |
+						mut_x.unlock(); // st.rel mut_x 
+						```
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+						### Last But Not Least 
+						*	Be aware of the architecture: the X86 memory model is acquire/release
+							*	Loads are not reordered with other loads. Stores are not reordered with other stores. Stores are not reordered with older loads.
+							*	Loads may be reordered with older stores to different locations.
+							*	Acquire: R/W after a load cannot be reordered before the load.
+							*	Release: R/W before a store cannot be reordered after the store.
+						*	Proof: Write a program that has a race condition, experiment on ARM and X86 Simulator separately.
+					</script>
+				</section>
+
+
 			
 			</section>
 
