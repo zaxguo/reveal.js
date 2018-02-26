@@ -386,7 +386,14 @@
 				</section>
 			</section>
 
-			
+			<section data-markdown>
+			<script type="text/template">
+			### Conclusions
+			*	Memory Models describe the semantics of memory actions on shared variables. 
+			*	Java pioneered its memory model in 1995, fixed 10 years later; C++11 implemented in general 4 different memory model; Rust needs a memory model.
+			*	Current thread library (i.e., Pthread) implements its locks, thread creation using memory fence instructions; they provide safety guarantee if you don't write data-racy code.
+			</script>
+			</section>
 
 
 				<!--
